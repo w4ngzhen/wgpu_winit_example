@@ -10,6 +10,6 @@ winit 0.30.0+.
 Except for dependencies that share the top-level workspace, the code for each chapter is independent.
 
 ```shell
-# ch01_render_a_triangle, chapter_02, ... whatever.
+# ch01_render_a_triangle, ch02_xxx, ... whatever.
 $ cargo run --package ch01_render_a_triangle
 ```
