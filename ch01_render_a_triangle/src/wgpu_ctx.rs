@@ -51,10 +51,8 @@ impl<'window> WgpuCtx<'window> {
             label: None,
             source: ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
         });
-        let swap_chain_capabilities = surface.get_capabilities(&adapter);
-        let swap_chain_format = swap_chain_capabilities.formats[0];
 
-        let render_pipeline = create_pipeline(&device, &shader, swap_chain_format);
+        let render_pipeline = create_pipeline(&device, &shader, surface_config.format);
 
         WgpuCtx {
             surface,
