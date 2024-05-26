@@ -16,9 +16,6 @@ pub struct WgpuCtx<'window> {
 
 impl<'window> WgpuCtx<'window> {
     pub async fn new_async(window: Arc<Window>) -> WgpuCtx<'window> {
-        let mut size = window.inner_size();
-        size.width = size.width.max(1);
-        size.height = size.height.max(1);
         let instance = wgpu::Instance::default();
         let surface = instance.create_surface(Arc::clone(&window)).unwrap();
         let adapter = instance
@@ -44,9 +41,16 @@ impl<'window> WgpuCtx<'window> {
             )
             .await
             .expect("Failed to create device");
-        let surface_config = surface
-            .get_default_config(&adapter, size.width, size.height)
-            .unwrap();
+
+        // 获取窗口内部物理像素尺寸（没有标题栏）
+        let mut size = window.inner_size();
+        // 至少（w = 1, h = 1），否则Wgpu会panic
+        let width = size.width.max(1);
+        let height = size.height.max(1);
+        // 获取一个默认配置
+        let surface_config = surface.get_default_config(&adapter, width, height).unwrap();
+        // 完成首次配置
+        surface.configure(&device, &surface_config);
 
         // Load the shaders from disk
         let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
