@@ -1,5 +1,5 @@
 [package]
-name = "ch01_render_a_triangle"
+name = "ch02_render_a_triangle"
 version = "0.1.0"
 edition = "2021"
 

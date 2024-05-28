@@ -1,3 +1,3 @@
-# chapter_01
+# chapter_02
 
 Render a triangle.

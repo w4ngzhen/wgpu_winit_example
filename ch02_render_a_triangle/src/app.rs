@@ -1,9 +1,11 @@
-use crate::wgpu_ctx::WgpuCtx;
 use std::sync::Arc;
+
 use winit::application::ApplicationHandler;
 use winit::event::WindowEvent;
 use winit::event_loop::ActiveEventLoop;
 use winit::window::{Window, WindowId};
+
+use crate::wgpu_ctx::WgpuCtx;
 
 #[derive(Default)]
 pub struct App<'window> {
