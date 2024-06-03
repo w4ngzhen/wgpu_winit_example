@@ -74,11 +74,11 @@ impl<'window> WgpuCtx<'window> {
     }
 
     pub fn draw(&mut self) {
-        let frame = self
+        let surface_texture = self
             .surface
             .get_current_texture()
             .expect("Failed to acquire next swap chain texture");
-        let view = frame
+        let texture_view = surface_texture
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
         let mut encoder = self
@@ -88,7 +88,7 @@ impl<'window> WgpuCtx<'window> {
             let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: None,
                 color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-                    view: &view,
+                    view: &texture_view,
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
@@ -103,7 +103,7 @@ impl<'window> WgpuCtx<'window> {
             rpass.draw(0..3, 0..1);
         }
         self.queue.submit(Some(encoder.finish()));
-        frame.present();
+        surface_texture.present();
     }
 }
 
