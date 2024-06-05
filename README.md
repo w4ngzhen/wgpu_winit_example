@@ -13,3 +13,9 @@ Except for dependencies that share the top-level workspace, the code for each ch
 # ch02_render_a_triangle, ch03_xxx, ... whatever.
 $ cargo run --package ch02_render_a_triangle
 ```
+
+# Example
+
+## chapter01
+
+![](./ch01_render_in_window/example.gif)
