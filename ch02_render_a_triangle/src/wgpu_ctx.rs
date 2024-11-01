@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 use wgpu::MemoryHints::Performance;
-use wgpu::{ShaderSource, TextureFormat};
+use wgpu::{ShaderSource};
 use winit::window::Window;
 
 pub struct WgpuCtx<'window> {
@@ -111,22 +111,16 @@ impl<'window> WgpuCtx<'window> {
 
 fn create_pipeline(
     device: &wgpu::Device,
-    swap_chain_format: TextureFormat,
+    swap_chain_format: wgpu::TextureFormat,
 ) -> wgpu::RenderPipeline {
     // Load the shaders from disk
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
         label: None,
         source: ShaderSource::Wgsl(Cow::Borrowed(include_str!("shader.wgsl"))),
     });
-
-    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+    device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
         label: None,
-        bind_group_layouts: &[],
-        push_constant_ranges: &[],
-    });
-    return device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-        label: None,
-        layout: Some(&pipeline_layout),
+        layout: None,
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: "vs_main",
@@ -140,7 +134,7 @@ fn create_pipeline(
             targets: &[Some(swap_chain_format.into())],
         }),
         primitive: wgpu::PrimitiveState {
-            // topology: wgpu::PrimitiveTopology::TriangleList,
+            topology: wgpu::PrimitiveTopology::TriangleList,
             // strip_index_format: None,
             // front_face: wgpu::FrontFace::Ccw,
             // cull_mode: Some(wgpu::Face::Back),
@@ -157,5 +151,5 @@ fn create_pipeline(
         multisample: wgpu::MultisampleState::default(),
         multiview: None,
         cache: None,
-    });
+    })
 }
