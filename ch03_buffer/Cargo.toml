@@ -1,5 +1,5 @@
 [package]
-name = "ch03_switch_pipeline"
+name = "ch03_buffer"
 version = "0.1.0"
 edition = "2021"
 
