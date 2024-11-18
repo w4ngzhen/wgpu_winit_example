@@ -2,7 +2,9 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use wgpu::MemoryHints::Performance;
 use wgpu::{ShaderSource};
+use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use winit::window::Window;
+use crate::vertex::{create_vertex_buffer_layout, VERTEX_LIST};
 
 pub struct WgpuCtx<'window> {
     surface: wgpu::Surface<'window>,
@@ -11,6 +13,7 @@ pub struct WgpuCtx<'window> {
     device: wgpu::Device,
     queue: wgpu::Queue,
     render_pipeline: wgpu::RenderPipeline,
+    vertex_buffer: wgpu::Buffer,
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -54,6 +57,13 @@ impl<'window> WgpuCtx<'window> {
 
         let render_pipeline = create_pipeline(&device, surface_config.format);
 
+        let bytes: &[u8] = bytemuck::cast_slice(&VERTEX_LIST);
+        let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
+            label: None,
+            contents: bytes,
+            usage: wgpu::BufferUsages::VERTEX,
+        });
+
         WgpuCtx {
             surface,
             surface_config,
@@ -61,6 +71,7 @@ impl<'window> WgpuCtx<'window> {
             device,
             queue,
             render_pipeline,
+            vertex_buffer,
         }
     }
 
@@ -102,7 +113,10 @@ impl<'window> WgpuCtx<'window> {
                 occlusion_query_set: None,
             });
             rpass.set_pipeline(&self.render_pipeline);
-            rpass.draw(0..3, 0..1);
+            // 消费存放的 vertex_buffer
+            rpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+            // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
+            rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
         }
         self.queue.submit(Some(encoder.finish()));
         surface_texture.present();
@@ -124,7 +138,9 @@ fn create_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
-            buffers: &[],
+            buffers: &[
+                create_vertex_buffer_layout()
+            ],
             compilation_options: Default::default(),
         },
         fragment: Some(wgpu::FragmentState {
