@@ -4,7 +4,7 @@ use wgpu::MemoryHints::Performance;
 use wgpu::{ShaderSource};
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use winit::window::Window;
-use crate::vertex::{create_vertex_buffer_layout, VERTEX_LIST};
+use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 
 pub struct WgpuCtx<'window> {
     surface: wgpu::Surface<'window>,
@@ -14,6 +14,7 @@ pub struct WgpuCtx<'window> {
     queue: wgpu::Queue,
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
+    vertex_index_buffer: wgpu::Buffer, // 新增
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -63,6 +64,14 @@ impl<'window> WgpuCtx<'window> {
             contents: bytes,
             usage: wgpu::BufferUsages::VERTEX,
         });
+        // 将顶点索引数据转为字节数据
+        let vertex_index_bytes = bytemuck::cast_slice(&VERTEX_INDEX_LIST);
+        // 创建顶点索引缓冲数据
+        let vertex_index_buffer = device.create_buffer_init(&BufferInitDescriptor {
+            label: None,
+            contents: vertex_index_bytes,
+            usage: wgpu::BufferUsages::INDEX, // 注意，usage字段使用INDEX枚举，表明是顶点索引
+        });
 
         WgpuCtx {
             surface,
@@ -72,6 +81,7 @@ impl<'window> WgpuCtx<'window> {
             queue,
             render_pipeline,
             vertex_buffer,
+            vertex_index_buffer
         }
     }
 
@@ -115,6 +125,10 @@ impl<'window> WgpuCtx<'window> {
             rpass.set_pipeline(&self.render_pipeline);
             // 消费存放的 vertex_buffer
             rpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+            // 消费存放的 vertex_index_buffer
+            rpass.set_index_buffer(self.vertex_index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
+            // 调用draw_indexed，传入对应数量的顶点数量
+            rpass.draw_indexed(0..VERTEX_INDEX_LIST.len() as u32, 0, 0..1);
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
         }
