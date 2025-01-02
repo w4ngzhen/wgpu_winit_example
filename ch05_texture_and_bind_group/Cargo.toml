@@ -1,0 +1,13 @@
+[package]
+name = "ch05_texture_and_bind_group"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+winit.workspace = true
+pollster.workspace = true
+wgpu.workspace = true
+bytemuck = "1.19.0"
+image = "0.25.5"
