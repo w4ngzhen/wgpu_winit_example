@@ -1,5 +1,5 @@
 [package]
-name = "ch03_buffer"
+name = "ch04_vertex_index_buffer"
 version = "0.1.0"
 edition = "2021"
 
