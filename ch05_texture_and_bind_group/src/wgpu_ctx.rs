@@ -1,10 +1,11 @@
+use crate::img_utils::RgbaImg;
+use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 use std::borrow::Cow;
 use std::sync::Arc;
-use wgpu::MemoryHints::Performance;
-use wgpu::{ShaderSource};
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
+use wgpu::MemoryHints::Performance;
+use wgpu::ShaderSource;
 use winit::window::Window;
-use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 
 pub struct WgpuCtx<'window> {
     surface: wgpu::Surface<'window>,
@@ -14,7 +15,9 @@ pub struct WgpuCtx<'window> {
     queue: wgpu::Queue,
     render_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
-    vertex_index_buffer: wgpu::Buffer, // 新增
+    vertex_index_buffer: wgpu::Buffer,
+    texture: wgpu::Texture,
+    texture_image: RgbaImg,
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -73,6 +76,29 @@ impl<'window> WgpuCtx<'window> {
             usage: wgpu::BufferUsages::INDEX, // 注意，usage字段使用INDEX枚举，表明是顶点索引
         });
 
+        // 构造图片对象（这里为了代码简洁，我们假设图片加载没有问题，直接unwrap，请读者务必保证图片加载正确性）
+        let img = RgbaImg::new("assets/example-img.png").unwrap();
+        // 构造Texture实例
+        let texture = device.create_texture(&wgpu::TextureDescriptor {
+            label: None,
+            // size字段用于表达纹理的基本尺寸结构（宽、高以及深度）
+            // 纹理是以3D形式存储，如果想要表示2D纹理，只需要将下方的深度字段设置为1
+            size: wgpu::Extent3d {
+                width: img.width, // 图片的宽高
+                height: img.height,
+                depth_or_array_layers: 1, // <-- 设置为1表示2D纹理
+            },
+            mip_level_count: 1, // 后面会详细介绍此字段
+            sample_count: 1,
+            dimension: wgpu::TextureDimension::D2,
+            // 大多数图像都是使用 sRGB 来存储的，我们需要在这里指定。
+            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            // TEXTURE_BINDING 表示我们要在着色器中使用这个纹理。
+            // COPY_DST 表示我们能将数据复制到这个纹理上。
+            usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
+            view_formats: &[],
+        });
+
         WgpuCtx {
             surface,
             surface_config,
@@ -81,7 +107,9 @@ impl<'window> WgpuCtx<'window> {
             queue,
             render_pipeline,
             vertex_buffer,
-            vertex_index_buffer
+            vertex_index_buffer,
+            texture,
+            texture_image: img,
         }
     }
 
@@ -126,8 +154,11 @@ impl<'window> WgpuCtx<'window> {
             // 消费存放的 vertex_buffer
             rpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             // 消费存放的 vertex_index_buffer
-            rpass.set_index_buffer(self.vertex_index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
-            // 调用draw_indexed，传入对应数量的顶点数量
+            rpass.set_index_buffer(
+                self.vertex_index_buffer.slice(..),
+                wgpu::IndexFormat::Uint16,
+            ); // 1.
+               // 调用draw_indexed，传入对应数量的顶点数量
             rpass.draw_indexed(0..VERTEX_INDEX_LIST.len() as u32, 0, 0..1);
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
@@ -152,9 +183,7 @@ fn create_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
-            buffers: &[
-                create_vertex_buffer_layout()
-            ],
+            buffers: &[create_vertex_buffer_layout()],
             compilation_options: Default::default(),
         },
         fragment: Some(wgpu::FragmentState {
