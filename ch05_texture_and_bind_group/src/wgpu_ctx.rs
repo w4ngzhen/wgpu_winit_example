@@ -18,6 +18,7 @@ pub struct WgpuCtx<'window> {
     vertex_index_buffer: wgpu::Buffer,
     texture: wgpu::Texture,
     texture_image: RgbaImg,
+    texture_size: wgpu::Extent3d,
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -78,16 +79,17 @@ impl<'window> WgpuCtx<'window> {
 
         // 构造图片对象（这里为了代码简洁，我们假设图片加载没有问题，直接unwrap，请读者务必保证图片加载正确性）
         let img = RgbaImg::new("assets/example-img.png").unwrap();
+        // 纹理是以3D形式存储，如果想要表示2D纹理，只需要将下方的深度字段设置为1
+        let texture_size = wgpu::Extent3d {
+            width: img.width, // 图片的宽高
+            height: img.height,
+            depth_or_array_layers: 1, // <-- 设置为1表示2D纹理
+        };
         // 构造Texture实例
         let texture = device.create_texture(&wgpu::TextureDescriptor {
             label: None,
             // size字段用于表达纹理的基本尺寸结构（宽、高以及深度）
-            // 纹理是以3D形式存储，如果想要表示2D纹理，只需要将下方的深度字段设置为1
-            size: wgpu::Extent3d {
-                width: img.width, // 图片的宽高
-                height: img.height,
-                depth_or_array_layers: 1, // <-- 设置为1表示2D纹理
-            },
+            size: texture_size,
             mip_level_count: 1, // 后面会详细介绍此字段
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
@@ -110,6 +112,7 @@ impl<'window> WgpuCtx<'window> {
             vertex_index_buffer,
             texture,
             texture_image: img,
+            texture_size,
         }
     }
 
