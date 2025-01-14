@@ -78,7 +78,7 @@ impl<'window> WgpuCtx<'window> {
         });
 
         // 构造图片对象（这里为了代码简洁，我们假设图片加载没有问题，直接unwrap，请读者务必保证图片加载正确性）
-        let img = RgbaImg::new("assets/example-img.png").unwrap();
+        let img = RgbaImg::new("/Users/w4ngzhen/projects/rust-projects/wgpu_winit_example/ch05_texture_and_bind_group/assets/example-img.png").unwrap();
         // 纹理是以3D形式存储，如果想要表示2D纹理，只需要将下方的深度字段设置为1
         let texture_size = wgpu::Extent3d {
             width: img.width, // 图片的宽高
@@ -166,6 +166,23 @@ impl<'window> WgpuCtx<'window> {
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
         }
+        self.queue.write_texture(
+            // 告诉 wgpu 将像素数据复制到何处
+            wgpu::ImageCopyTexture {
+                texture: &self.texture, // <-- 纹理对象
+                mip_level: 0,
+                origin: wgpu::Origin3d::ZERO,
+                aspect: wgpu::TextureAspect::All,
+            },
+            &self.texture_image.bytes, // <-- 像素rgba二进制数据
+            // 纹理的内存布局
+            wgpu::ImageDataLayout {
+                offset: 0,
+                bytes_per_row: Some(4 * self.texture_image.width),
+                rows_per_image: Some(self.texture_image.height),
+            },
+            self.texture_size, // <-- Extend3d对象
+        );
         self.queue.submit(Some(encoder.finish()));
         surface_texture.present();
     }
