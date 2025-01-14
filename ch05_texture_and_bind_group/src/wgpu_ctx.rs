@@ -4,7 +4,7 @@ use std::borrow::Cow;
 use std::sync::Arc;
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
 use wgpu::MemoryHints::Performance;
-use wgpu::ShaderSource;
+use wgpu::{SamplerDescriptor, ShaderSource};
 use winit::window::Window;
 
 pub struct WgpuCtx<'window> {
@@ -19,6 +19,7 @@ pub struct WgpuCtx<'window> {
     texture: wgpu::Texture,
     texture_image: RgbaImg,
     texture_size: wgpu::Extent3d,
+    sampler: wgpu::Sampler,
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -101,6 +102,14 @@ impl<'window> WgpuCtx<'window> {
             view_formats: &[],
         });
 
+        // 创建采样器
+        let sampler = device.create_sampler(&SamplerDescriptor {
+            address_mode_u: wgpu::AddressMode::ClampToEdge,
+            address_mode_v: wgpu::AddressMode::ClampToEdge,
+            address_mode_w: wgpu::AddressMode::ClampToEdge,
+            ..Default::default()
+        });
+
         WgpuCtx {
             surface,
             surface_config,
@@ -113,6 +122,7 @@ impl<'window> WgpuCtx<'window> {
             texture,
             texture_image: img,
             texture_size,
+            sampler,
         }
     }
 
