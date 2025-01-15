@@ -2,7 +2,7 @@ use crate::img_utils::RgbaImg;
 use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 use std::borrow::Cow;
 use std::sync::Arc;
-use wgpu::util::{BufferInitDescriptor, DeviceExt};
+use wgpu::util::{BufferInitDescriptor, DeviceExt, RenderEncoder};
 use wgpu::MemoryHints::Performance;
 use wgpu::{SamplerDescriptor, ShaderSource};
 use winit::window::Window;
@@ -20,6 +20,7 @@ pub struct WgpuCtx<'window> {
     texture_image: RgbaImg,
     texture_size: wgpu::Extent3d,
     sampler: wgpu::Sampler,
+    bind_group: wgpu::BindGroup,
 }
 
 impl<'window> WgpuCtx<'window> {
@@ -110,6 +111,47 @@ impl<'window> WgpuCtx<'window> {
             ..Default::default()
         });
 
+        // 创建绑定组布局
+        let bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+            entries: &[
+                wgpu::BindGroupLayoutEntry {
+                    binding: 0,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    ty: wgpu::BindingType::Texture {
+                        multisampled: false,
+                        view_dimension: wgpu::TextureViewDimension::D2,
+                        sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                    },
+                    count: None,
+                },
+                wgpu::BindGroupLayoutEntry {
+                    binding: 1,
+                    visibility: wgpu::ShaderStages::FRAGMENT,
+                    // 注意 Filtering 需要和上面 sample_type filterable: true 保持一致
+                    ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+                    count: None,
+                },
+            ],
+            label: None,
+        });
+        // 创建绑定组
+        let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
+            layout: &bind_group_layout,
+            entries: &[
+                wgpu::BindGroupEntry {
+                    binding: 0,
+                    resource: wgpu::BindingResource::TextureView(
+                        &texture.create_view(&wgpu::TextureViewDescriptor::default()),
+                    ),
+                },
+                wgpu::BindGroupEntry {
+                    binding: 1,
+                    resource: wgpu::BindingResource::Sampler(&sampler),
+                },
+            ],
+            label: None,
+        });
+
         WgpuCtx {
             surface,
             surface_config,
@@ -123,6 +165,7 @@ impl<'window> WgpuCtx<'window> {
             texture_image: img,
             texture_size,
             sampler,
+            bind_group,
         }
     }
 
@@ -163,6 +206,7 @@ impl<'window> WgpuCtx<'window> {
                 timestamp_writes: None,
                 occlusion_query_set: None,
             });
+            rpass.set_bind_group(0, &self.bind_group, &[]);
             rpass.set_pipeline(&self.render_pipeline);
             // 消费存放的 vertex_buffer
             rpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
@@ -170,8 +214,8 @@ impl<'window> WgpuCtx<'window> {
             rpass.set_index_buffer(
                 self.vertex_index_buffer.slice(..),
                 wgpu::IndexFormat::Uint16,
-            ); // 1.
-               // 调用draw_indexed，传入对应数量的顶点数量
+            );
+            // 调用draw_indexed，传入对应数量的顶点数量
             rpass.draw_indexed(0..VERTEX_INDEX_LIST.len() as u32, 0, 0..1);
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
