@@ -2,7 +2,7 @@
 #[derive(Copy, Clone, Debug)]
 pub struct Vertex {
     position: [f32; 3],
-    color: [f32; 3],
+    tex_uv: [f32; 2],
 }
 
 // 以下两个impl是bytemuck提供的两个特殊trait
@@ -11,17 +11,17 @@ unsafe impl bytemuck::Pod for Vertex {}
 
 pub const VERTEX_LIST: &[Vertex] = &[
     // a
-    Vertex { position: [0.0, 0.5, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [0.0, 0.5, 0.0], tex_uv: [0.5, 1.0] },
     // b
-    Vertex { position: [-0.5, 0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [-0.5, 0.3, 0.0], tex_uv: [0.0, 0.7] },
     // c
-    Vertex { position: [-0.5, -0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [-0.5, -0.3, 0.0], tex_uv: [0.0, 0.3] },
     // d
-    Vertex { position: [0.0, -0.5, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [0.0, -0.5, 0.0], tex_uv: [0.5, 0.0] },
     // e
-    Vertex { position: [0.5, -0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [0.5, -0.3, 0.0], tex_uv: [1.0, 0.3] },
     // f
-    Vertex { position: [0.5, 0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex { position: [0.5, 0.3, 0.0], tex_uv: [1.0, 0.7] },
 ];
 
 pub const VERTEX_INDEX_LIST: &[u16] = &[
@@ -44,8 +44,8 @@ pub fn create_vertex_buffer_layout() -> wgpu::VertexBufferLayout<'static> {
             wgpu::VertexAttribute {
                 // 这里的偏移，是要偏移position的字节长度
                 offset: size_of::<[f32; 3]>() as wgpu::BufferAddress,
-                shader_location: 1, // 我们把颜色信息数据指定为location = 1的地方
-                format: wgpu::VertexFormat::Float32x3,
+                shader_location: 1,
+                format: wgpu::VertexFormat::Float32x2, // <-- 对应上面tex_uv: [f32; 2]
             },
         ],
     }
