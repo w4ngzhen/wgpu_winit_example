@@ -78,7 +78,7 @@ impl<'window> WgpuCtx<'window> {
         });
 
         // 构造图片对象（这里为了代码简洁，我们假设图片加载没有问题，直接unwrap，请读者务必保证图片加载正确性）
-        let img = RgbaImg::new("/Users/w4ngzhen/projects/rust-projects/wgpu_winit_example/ch05_texture_and_bind_group/assets/example-img.png").unwrap();
+        let img = RgbaImg::new("/图片目录地址，请修改/").unwrap();
         // 纹理是以3D形式存储，如果想要表示2D纹理，只需要将下方的深度字段设置为1
         let texture_size = wgpu::Extent3d {
             width: img.width, // 图片的宽高
