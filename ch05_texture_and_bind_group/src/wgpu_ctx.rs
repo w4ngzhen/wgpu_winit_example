@@ -62,8 +62,6 @@ impl<'window> WgpuCtx<'window> {
         // 完成首次配置
         surface.configure(&device, &surface_config);
 
-        let render_pipeline = create_pipeline(&device, surface_config.format);
-
         let bytes: &[u8] = bytemuck::cast_slice(&VERTEX_LIST);
         let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: None,
@@ -151,6 +149,15 @@ impl<'window> WgpuCtx<'window> {
             ],
             label: None,
         });
+        // 创建管线布局
+        let render_pipeline_layout =
+            device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+                label: None,
+                bind_group_layouts: &[&bind_group_layout], // <-- 将绑定组布局设置到管线布局
+                push_constant_ranges: &[],
+            });
+
+        let render_pipeline = create_pipeline(&device, surface_config.format, &render_pipeline_layout);
 
         WgpuCtx {
             surface,
@@ -245,6 +252,7 @@ impl<'window> WgpuCtx<'window> {
 fn create_pipeline(
     device: &wgpu::Device,
     swap_chain_format: wgpu::TextureFormat,
+    pipeline_layout: &wgpu::PipelineLayout,
 ) -> wgpu::RenderPipeline {
     // Load the shaders from disk
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
@@ -253,7 +261,7 @@ fn create_pipeline(
     });
     device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
         label: None,
-        layout: None,
+        layout: Some(pipeline_layout),
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
