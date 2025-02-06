@@ -9,4 +9,4 @@ edition = "2021"
 winit.workspace = true
 pollster.workspace = true
 wgpu.workspace = true
-bytemuck = "1.19.0"
+bytemuck = "1.21.0"

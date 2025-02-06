@@ -157,7 +157,8 @@ impl<'window> WgpuCtx<'window> {
                 push_constant_ranges: &[],
             });
 
-        let render_pipeline = create_pipeline(&device, surface_config.format, &render_pipeline_layout);
+        let render_pipeline =
+            create_pipeline(&device, surface_config.format, &render_pipeline_layout);
 
         WgpuCtx {
             surface,
@@ -229,7 +230,7 @@ impl<'window> WgpuCtx<'window> {
         }
         self.queue.write_texture(
             // 告诉 wgpu 将像素数据复制到何处
-            wgpu::ImageCopyTexture {
+            wgpu::TexelCopyTextureInfo {
                 texture: &self.texture, // <-- 纹理对象
                 mip_level: 0,
                 origin: wgpu::Origin3d::ZERO,
@@ -237,7 +238,7 @@ impl<'window> WgpuCtx<'window> {
             },
             &self.texture_image.bytes, // <-- 像素rgba二进制数据
             // 纹理的内存布局
-            wgpu::ImageDataLayout {
+            wgpu::TexelCopyBufferLayout {
                 offset: 0,
                 bytes_per_row: Some(4 * self.texture_image.width),
                 rows_per_image: Some(self.texture_image.height),
