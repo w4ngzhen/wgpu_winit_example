@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::sync::Arc;
-use wgpu::{ShaderModule, ShaderSource, TextureFormat};
 use wgpu::MemoryHints::Performance;
+use wgpu::{ShaderModule, ShaderSource, TextureFormat, Trace};
 use winit::window::Window;
 
 pub struct WgpuCtx<'window> {
@@ -30,17 +30,15 @@ impl<'window> WgpuCtx<'window> {
             .expect("Failed to find an appropriate adapter");
         // Create the logical device and command queue
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: None,
-                    required_features: wgpu::Features::empty(),
-                    // Make sure we use the texture resolution limits from the adapter, so we can support images the size of the swapchain.
-                    required_limits: wgpu::Limits::downlevel_webgl2_defaults()
-                        .using_resolution(adapter.limits()),
-                    memory_hints: Performance,
-                },
-                None,
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                label: None,
+                required_features: wgpu::Features::empty(),
+                // Make sure we use the texture resolution limits from the adapter, so we can support images the size of the swapchain.
+                required_limits: wgpu::Limits::downlevel_webgl2_defaults()
+                    .using_resolution(adapter.limits()),
+                memory_hints: Performance,
+                trace: Trace::Off,
+            })
             .await
             .expect("Failed to create device");
 

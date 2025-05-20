@@ -1,10 +1,10 @@
+use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 use std::borrow::Cow;
 use std::sync::Arc;
-use wgpu::MemoryHints::Performance;
-use wgpu::{ShaderSource};
 use wgpu::util::{BufferInitDescriptor, DeviceExt};
+use wgpu::MemoryHints::Performance;
+use wgpu::{ShaderSource, Trace};
 use winit::window::Window;
-use crate::vertex::{create_vertex_buffer_layout, VERTEX_INDEX_LIST, VERTEX_LIST};
 
 pub struct WgpuCtx<'window> {
     surface: wgpu::Surface<'window>,
@@ -32,17 +32,15 @@ impl<'window> WgpuCtx<'window> {
             .expect("Failed to find an appropriate adapter");
         // Create the logical device and command queue
         let (device, queue) = adapter
-            .request_device(
-                &wgpu::DeviceDescriptor {
-                    label: None,
-                    required_features: wgpu::Features::empty(),
-                    // Make sure we use the texture resolution limits from the adapter, so we can support images the size of the swapchain.
-                    required_limits: wgpu::Limits::downlevel_webgl2_defaults()
-                        .using_resolution(adapter.limits()),
-                    memory_hints: Performance,
-                },
-                None,
-            )
+            .request_device(&wgpu::DeviceDescriptor {
+                label: None,
+                required_features: wgpu::Features::empty(),
+                // Make sure we use the texture resolution limits from the adapter, so we can support images the size of the swapchain.
+                required_limits: wgpu::Limits::downlevel_webgl2_defaults()
+                    .using_resolution(adapter.limits()),
+                memory_hints: Performance,
+                trace: Trace::Off,
+            })
             .await
             .expect("Failed to create device");
 
@@ -81,7 +79,7 @@ impl<'window> WgpuCtx<'window> {
             queue,
             render_pipeline,
             vertex_buffer,
-            vertex_index_buffer
+            vertex_index_buffer,
         }
     }
 
@@ -126,8 +124,11 @@ impl<'window> WgpuCtx<'window> {
             // 消费存放的 vertex_buffer
             rpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             // 消费存放的 vertex_index_buffer
-            rpass.set_index_buffer(self.vertex_index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
-            // 调用draw_indexed，传入对应数量的顶点数量
+            rpass.set_index_buffer(
+                self.vertex_index_buffer.slice(..),
+                wgpu::IndexFormat::Uint16,
+            ); // 1.
+               // 调用draw_indexed，传入对应数量的顶点数量
             rpass.draw_indexed(0..VERTEX_INDEX_LIST.len() as u32, 0, 0..1);
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
@@ -152,9 +153,7 @@ fn create_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
-            buffers: &[
-                create_vertex_buffer_layout()
-            ],
+            buffers: &[create_vertex_buffer_layout()],
             compilation_options: Default::default(),
         },
         fragment: Some(wgpu::FragmentState {
