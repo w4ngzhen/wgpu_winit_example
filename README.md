@@ -1,8 +1,8 @@
 # wgpu_winit_example
 
-WGPU示例代码，使用 wgpu 23+版本 以及 winit 0.30.0+ 版本。
+WGPU示例代码，使用 wgpu 25+版本 以及 winit 0.30.0+ 版本。
 
-WGPU code example using wgpu 23+ and winit 0.30.0+.
+WGPU code example using wgpu 25+ and winit 0.30.0+.
 
 本项目是一个基于 winit 0.30.0+ 版本的WGPU示例项目，该项目主要适配了 winit 0.30.0+ 版本下新的代码结构体系。同时，该示例项目还可搭配本人编写的[《Wgpu图文详解》](https://zhen.blog/article/Wgpu-%E5%9B%BE%E6%96%87%E8%AF%A6%E8%A7%A3%EF%BC%8801%EF%BC%89%E7%AA%97%E5%8F%A3%E4%B8%8E%E5%9F%BA%E6%9C%AC%E6%B8%B2%E6%9F%93/)系列文章来学习。
 
