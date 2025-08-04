@@ -207,6 +207,7 @@ impl<'window> WgpuCtx<'window> {
                         load: wgpu::LoadOp::Clear(wgpu::Color::GREEN),
                         store: wgpu::StoreOp::Store,
                     },
+                    depth_slice: None,
                 })],
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
@@ -224,7 +225,7 @@ impl<'window> WgpuCtx<'window> {
             // 调用draw_indexed，传入对应数量的顶点数量
             rpass.draw_indexed(0..VERTEX_INDEX_LIST.len() as u32, 0, 0..1);
             // 顶点有原来的固定3个顶点，调整为根据 VERTEX_LIST 动态来计算
-            rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
+            //rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
         }
         self.queue.write_texture(
             // 告诉 wgpu 将像素数据复制到何处
