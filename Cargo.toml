@@ -9,4 +9,4 @@ edition = "2021"
 [workspace.dependencies]
 winit = { version = "0.30.11" }
 pollster = { version = "0.4" }
-wgpu = { version = "25.0.2" }
+wgpu = { version = "26.0.1" }
