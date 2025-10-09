@@ -22,6 +22,4 @@ $ cargo run --package ch02_render_a_triangle
 
 # screenshot
 
-![](_doc_assets/example1.gif)
-
-![](_doc_assets/example2.png)
+![](_doc_assets/example.jpg)
