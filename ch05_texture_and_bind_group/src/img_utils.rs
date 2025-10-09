@@ -24,6 +24,18 @@ impl RgbaImg {
             None
         }
     }
+
+    pub fn example() -> Option<Self> {
+        let file_bytes = include_bytes!("../assets/example-img.png");
+        let dynamic_img = image::load_from_memory(&file_bytes[..]).unwrap();
+        let rgba_img = dynamic_img.to_rgba8();
+        let (width, height) = dynamic_img.dimensions();
+        Some(Self {
+            width,
+            height,
+            bytes: rgba_img.into_raw(),
+        })
+    }
 }
 
 fn read_file_to_memory(filename: &str) -> io::Result<Vec<u8>> {
@@ -39,7 +51,7 @@ mod test {
     #[test]
     pub fn test_valid_img() {
         // 请确保assets/目录下存在一个合法的example-img.png（320x320的图片）
-        let img = RgbaImg::new("assets/example-img.png");
+        let img = RgbaImg::example();
         assert!(img.is_some());
         if let Some(img) = img {
             assert_eq!(img.width, 320);

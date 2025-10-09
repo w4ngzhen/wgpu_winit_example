@@ -36,6 +36,7 @@ impl<'window> WgpuCtx<'window> {
                 // Make sure we use the texture resolution limits from the adapter, so we can support images the size of the swapchain.
                 required_limits: wgpu::Limits::downlevel_webgl2_defaults()
                     .using_resolution(adapter.limits()),
+                experimental_features: Default::default(),
                 memory_hints: Performance,
                 trace: Trace::Off,
             })
