@@ -153,7 +153,7 @@ impl<'window> WgpuCtx<'window> {
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: None,
                 bind_group_layouts: &[&bind_group_layout], // <-- 将绑定组布局设置到管线布局
-                push_constant_ranges: &[],
+                immediate_size: 0,
             });
 
         let render_pipeline =
@@ -213,6 +213,7 @@ impl<'window> WgpuCtx<'window> {
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
                 occlusion_query_set: None,
+                multiview_mask: None,
             });
             rpass.set_bind_group(0, &self.bind_group, &[]);
             rpass.set_pipeline(&self.render_pipeline);
@@ -281,7 +282,7 @@ fn create_pipeline(
         },
         depth_stencil: None,
         multisample: wgpu::MultisampleState::default(),
-        multiview: None,
         cache: None,
+        multiview_mask: None,
     })
 }

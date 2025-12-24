@@ -100,6 +100,7 @@ impl<'window> WgpuCtx<'window> {
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
                 occlusion_query_set: None,
+                multiview_mask: None,
             });
             rpass.set_pipeline(&self.render_pipeline);
             rpass.draw(0..3, 0..1);
@@ -149,7 +150,7 @@ fn create_pipeline(
         },
         depth_stencil: None,
         multisample: wgpu::MultisampleState::default(),
-        multiview: None,
+        multiview_mask: None,
         cache: None,
     })
 }
