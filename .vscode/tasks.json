@@ -17,6 +17,134 @@
         "panel": "shared",
         "clear": true
       }
+    },
+    {
+      "label": "cargo: run ch00_simple_winit",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch00_simple_winit"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch01_render_in_window",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch01_render_in_window"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch02_render_a_triangle",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch02_render_a_triangle"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch02_render_a_triangle switch_pipeline",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch02_render_a_triangle",
+        "--example",
+        "switch_pipeline"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch03_vertex_buffer",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch03_vertex_buffer"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch04_vertex_index_buffer",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch04_vertex_index_buffer"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "cargo: run ch05_texture_and_bind_group",
+      "type": "shell",
+      "command": "cargo",
+      "args": [
+        "run",
+        "-p",
+        "ch05_texture_and_bind_group"
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
     }
   ]
 }
