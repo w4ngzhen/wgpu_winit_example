@@ -3,9 +3,9 @@ use winit::error::EventLoopError;
 use winit::event_loop::{ControlFlow, EventLoop};
 
 mod app;
-mod wgpu_ctx;
-mod vertex;
 mod img_utils;
+mod vertex;
+mod wgpu_ctx;
 
 fn main() -> Result<(), EventLoopError> {
     let event_loop = EventLoop::new().unwrap();

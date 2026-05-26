@@ -11,17 +11,35 @@ unsafe impl bytemuck::Pod for Vertex {}
 
 pub const VERTEX_LIST: &[Vertex] = &[
     // a
-    Vertex { position: [0.0, 0.5, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [0.0, 0.5, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
     // b
-    Vertex { position: [-0.5, 0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [-0.5, 0.3, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
     // c
-    Vertex { position: [-0.5, -0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [-0.5, -0.3, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
     // d
-    Vertex { position: [0.0, -0.5, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [0.0, -0.5, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
     // e
-    Vertex { position: [0.5, -0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [0.5, -0.3, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
     // f
-    Vertex { position: [0.5, 0.3, 0.0], color: [0.0, 0.2, 1.0] },
+    Vertex {
+        position: [0.5, 0.3, 0.0],
+        color: [0.0, 0.2, 1.0],
+    },
 ];
 
 pub const VERTEX_INDEX_LIST: &[u16] = &[

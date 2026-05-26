@@ -1,7 +1,8 @@
 use image::GenericImageView;
+#[cfg(test)]
 use std::fs::File;
-use std::io;
-use std::io::Read;
+#[cfg(test)]
+use std::io::{self, Read};
 
 pub struct RgbaImg {
     pub width: u32,
@@ -10,6 +11,7 @@ pub struct RgbaImg {
 }
 
 impl RgbaImg {
+    #[cfg(test)]
     pub fn new(file_path: &str) -> Option<Self> {
         if let Ok(file_bytes) = read_file_to_memory(file_path) {
             let dynamic_img = image::load_from_memory(&file_bytes[..]).unwrap();
@@ -38,6 +40,7 @@ impl RgbaImg {
     }
 }
 
+#[cfg(test)]
 fn read_file_to_memory(filename: &str) -> io::Result<Vec<u8>> {
     let mut file = File::open(filename)?;
     let mut buffer = Vec::new();
@@ -45,6 +48,8 @@ fn read_file_to_memory(filename: &str) -> io::Result<Vec<u8>> {
     file.read_to_end(&mut buffer)?;
     Ok(buffer)
 }
+
+#[cfg(test)]
 mod test {
     use crate::img_utils::RgbaImg;
 

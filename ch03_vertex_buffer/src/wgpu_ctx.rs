@@ -9,7 +9,6 @@ use winit::window::Window;
 pub struct WgpuCtx<'window> {
     surface: wgpu::Surface<'window>,
     surface_config: wgpu::SurfaceConfiguration,
-    adapter: wgpu::Adapter,
     device: wgpu::Device,
     queue: wgpu::Queue,
     render_pipeline: wgpu::RenderPipeline,
@@ -45,7 +44,7 @@ impl<'window> WgpuCtx<'window> {
             .expect("Failed to create device");
 
         // 获取窗口内部物理像素尺寸（没有标题栏）
-        let mut size = window.inner_size();
+        let size = window.inner_size();
         // 至少（w = 1, h = 1），否则Wgpu会panic
         let width = size.width.max(1);
         let height = size.height.max(1);
@@ -66,7 +65,6 @@ impl<'window> WgpuCtx<'window> {
         WgpuCtx {
             surface,
             surface_config,
-            adapter,
             device,
             queue,
             render_pipeline,
@@ -86,10 +84,18 @@ impl<'window> WgpuCtx<'window> {
     }
 
     pub fn draw(&mut self) {
-        let surface_texture = self
-            .surface
-            .get_current_texture()
-            .expect("Failed to acquire next swap chain texture");
+        let surface_texture = match self.surface.get_current_texture() {
+            wgpu::CurrentSurfaceTexture::Success(texture)
+            | wgpu::CurrentSurfaceTexture::Suboptimal(texture) => texture,
+            wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => return,
+            wgpu::CurrentSurfaceTexture::Outdated | wgpu::CurrentSurfaceTexture::Lost => {
+                self.surface.configure(&self.device, &self.surface_config);
+                return;
+            }
+            wgpu::CurrentSurfaceTexture::Validation => {
+                panic!("Failed to acquire next swap chain texture")
+            }
+        };
         let texture_view = surface_texture
             .texture
             .create_view(&wgpu::TextureViewDescriptor::default());
