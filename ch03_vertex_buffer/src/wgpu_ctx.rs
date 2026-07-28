@@ -25,6 +25,7 @@ impl<'window> WgpuCtx<'window> {
                 force_fallback_adapter: false,
                 // Request an adapter which can render to our surface
                 compatible_surface: Some(&surface),
+                apply_limit_buckets: false,
             })
             .await
             .expect("Failed to find an appropriate adapter");
@@ -55,7 +56,7 @@ impl<'window> WgpuCtx<'window> {
 
         let render_pipeline = create_pipeline(&device, surface_config.format);
 
-        let bytes: &[u8] = bytemuck::cast_slice(&VERTEX_LIST);
+        let bytes: &[u8] = bytemuck::cast_slice(VERTEX_LIST);
         let vertex_buffer = device.create_buffer_init(&BufferInitDescriptor {
             label: None,
             contents: bytes,
@@ -126,7 +127,7 @@ impl<'window> WgpuCtx<'window> {
             rpass.draw(0..VERTEX_LIST.len() as u32, 0..1);
         }
         self.queue.submit(Some(encoder.finish()));
-        surface_texture.present();
+        self.queue.present(surface_texture);
     }
 }
 
@@ -145,7 +146,7 @@ fn create_pipeline(
         vertex: wgpu::VertexState {
             module: &shader,
             entry_point: Some("vs_main"),
-            buffers: &[create_vertex_buffer_layout()],
+            buffers: &[Some(create_vertex_buffer_layout())],
             compilation_options: Default::default(),
         },
         fragment: Some(wgpu::FragmentState {

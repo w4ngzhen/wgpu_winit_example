@@ -20,6 +20,7 @@ impl<'window> WgpuCtx<'window> {
                 force_fallback_adapter: false,
                 // Request an adapter which can render to our surface
                 compatible_surface: Some(&surface),
+                apply_limit_buckets: false,
             })
             .await
             .expect("Failed to find an appropriate adapter");
@@ -105,6 +106,6 @@ impl<'window> WgpuCtx<'window> {
             });
         }
         self.queue.submit(Some(encoder.finish()));
-        surface_texture.present();
+        self.queue.present(surface_texture);
     }
 }

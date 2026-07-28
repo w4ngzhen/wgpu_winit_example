@@ -25,13 +25,10 @@ impl ApplicationHandler for App {
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        match event {
-            WindowEvent::CloseRequested => {
-                // macOS err: https://github.com/rust-windowing/winit/issues/3668
-                // This will be fixed as winit 0.30.1.
-                event_loop.exit();
-            }
-            _ => (),
+        if let WindowEvent::CloseRequested = event {
+            // macOS err: https://github.com/rust-windowing/winit/issues/3668
+            // This will be fixed as winit 0.30.1.
+            event_loop.exit();
         }
     }
 }

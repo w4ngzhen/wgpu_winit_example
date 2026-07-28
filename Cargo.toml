@@ -8,6 +8,6 @@ edition = "2021"
 
 [workspace.dependencies]
 winit = { version = "0.30.13" }
-pollster = { version = "0.4.0" }
-wgpu = { version = "29.0.3" }
-bytemuck = { version = "1.25.0" }
+pollster = { version = "1.0.1" }
+wgpu = { version = "30.0.0" }
+bytemuck = { version = "1.25.2" }
